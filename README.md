@@ -8,7 +8,7 @@ It irreversibly overwrites files with random data, rendering them unusable while
 - **Secure File Shredding:** Overwrites file contents with random data for a specified number of passes.
 - **Cross-Platform Compatibility:** Supports macOS and Windows.
 - **Interactive TUI:** A terminal user interface built with [tview](https://github.com/rivo/tview) for easy navigation and operation.
-- **Native File Dialog Integration:**
+- **Native File Dialog Integration**
 - **Safety Checks:**  
   - Empty files (0 bytes) are detected and flagged as unnecessary for shredding.
   - A maximum pass count is enforced (default is 10, configurable in the code) to prevent excessive processing and storage decay.
