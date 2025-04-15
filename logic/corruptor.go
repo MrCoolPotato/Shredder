@@ -10,7 +10,6 @@ import (
 const MaxPasses = 10
 
 func CorruptFile(filePath string, passes int) error {
-
 	if passes > MaxPasses {
 		return fmt.Errorf("pass count (%d) exceeds maximum allowed (%d)", passes, MaxPasses)
 	}
@@ -39,10 +38,8 @@ func CorruptFile(filePath string, passes int) error {
 		if _, err := file.Seek(0, io.SeekStart); err != nil {
 			return fmt.Errorf("failed to seek file: %v", err)
 		}
-
 		remaining := fileSize
 		for remaining > 0 {
-
 			currentChunkSize := chunkSize
 			if remaining < chunkSize {
 				currentChunkSize = remaining
@@ -65,6 +62,26 @@ func CorruptFile(filePath string, passes int) error {
 		if err := file.Sync(); err != nil {
 			return fmt.Errorf("failed to sync file data: %v", err)
 		}
+	}
+
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		return fmt.Errorf("failed to seek file for header overwrite: %v", err)
+	}
+
+	headerSize := int64(1024)
+	if fileSize < headerSize {
+		headerSize = fileSize
+	}
+	headerBuffer := make([]byte, headerSize)
+	n, err := file.Write(headerBuffer)
+	if err != nil {
+		return fmt.Errorf("failed to overwrite file header: %v", err)
+	}
+	if int64(n) != headerSize {
+		return fmt.Errorf("incomplete header overwrite: wrote %d bytes, expected %d", n, headerSize)
+	}
+	if err := file.Sync(); err != nil {
+		return fmt.Errorf("failed to sync header overwrite: %v", err)
 	}
 
 	return nil
