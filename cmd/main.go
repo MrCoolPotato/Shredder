@@ -2,9 +2,10 @@ package main
 
 //MARK: Imports
 import (
+	"strconv"
 	"time"
 
-	"github.com/MrCoolPotato/Shredder/internal/logic"
+	"github.com/MrCoolPotato/Shredder/logic"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -35,7 +36,7 @@ func main() {
 
 	passesField := tview.NewInputField()
 	passesField.SetLabel("Passes: ")
-	passesField.SetText("3")
+	passesField.SetText("1")
 	passesField.SetFieldTextColor(tcell.ColorWhite)
 	passesField.SetAcceptanceFunc(func(textToCheck string, lastChar rune) bool {
 		return lastChar >= '0' && lastChar <= '9'
@@ -48,14 +49,36 @@ func main() {
 		SetChangedFunc(func() {
 			app.Draw()
 		})
-	logView.SetBorder(true).SetTitle("Status & Log")
+	logView.SetBorder(true).SetTitle(" Status ")
 	logView.Write([]byte("Awaiting file selection...\n"))
 
 	// MARK: Form Setup
 	form := tview.NewForm().
 		AddFormItem(fileField).
 		AddFormItem(passesField).
-		AddButton("Start Shredding", nil).
+		AddButton("Start Shredding", func() {
+
+			filePath := fileField.GetText()
+			if filePath == "" {
+				logView.Write([]byte("[red]No file selected.\n"))
+				return
+			}
+
+			passesStr := passesField.GetText()
+			passes, err := strconv.Atoi(passesStr)
+			if err != nil || passes <= 0 {
+				logView.Write([]byte("[red]Invalid number of passes: " + passesStr + "\n"))
+				return
+			}
+
+			logView.Write([]byte("[green]Starting file shredding...\n"))
+			err = logic.CorruptFile(filePath, passes)
+			if err != nil {
+				logView.Write([]byte("[red]Error shredding file: " + err.Error() + "\n"))
+			} else {
+				logView.Write([]byte("[green]File shredded successfully.\n"))
+			}
+		}).
 		AddButton("Select a File", func() {
 			done := make(chan struct{})
 			var selected string
