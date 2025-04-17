@@ -27,7 +27,7 @@ It irreversibly overwrites files with random data, rendering them unusable while
    The application overwrites the file content in chunks with random data, logging progress and any errors encountered.
    
 4. **Quit:**  
-   Use the "Quit" button to exit the application or just CTRL + C.
+   Use the "Quit" button to exit the application or just do CTRL + C.
 
 ## Usage (from source)
 
